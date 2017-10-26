@@ -25,7 +25,10 @@ class PartyBus:
 
         if len(player) > 0:
             embed = await self.player_stats(player, 1)
-            await ctx.send(embed=embed)
+            if embed is not None:
+                await ctx.send(embed=embed)
+            else:
+                await self.bot.embed_notify(ctx, 2, 'Notice', 'No solo statistics found!')
 
     @commands.command()
     async def duo(self, ctx, name: str = ''):
@@ -33,7 +36,10 @@ class PartyBus:
         player = await self.player_interface(ctx, name)
         if len(player) > 0:
             embed = await self.player_stats(player, 2)
-            await ctx.send(embed=embed)
+            if embed is not None:
+                await ctx.send(embed=embed)
+            else:
+                await self.bot.embed_notify(ctx, 2, 'Notice', 'No duo statistics found!')
 
     @commands.command()
     async def squad(self, ctx, name: str = ''):
@@ -41,7 +47,10 @@ class PartyBus:
         player = await self.player_interface(ctx, name)
         if len(player) > 0:
             embed = await self.player_stats(player, 3)
-            await ctx.send(embed=embed)
+            if embed is not None:
+                await ctx.send(embed=embed)
+            else:
+                await self.bot.embed_notify(ctx, 2, 'Notice', 'No squad statistics found!')
 
     @commands.command()
     async def lpg(self, ctx, name: str = ''):
@@ -171,7 +180,8 @@ class PartyBus:
                                                 value=str(round(stat['kills'] / (stat['games'] - stat['placeA']), 1)))
                                 embed.add_field(name='Top 10s', value=str(stat['placeB']))
                                 embed.add_field(name='Top 25s', value=str(stat['placeC']))
-                                break
+                                return embed
+                        return None
                     elif mode == 2:
                         embed.description = 'Duo Statistics'
                         for stat in js['stats']:
@@ -183,7 +193,8 @@ class PartyBus:
                                 embed.add_field(name='Kill Rate', value=str(round(stat['kills'] / stat['games'], 1)))
                                 embed.add_field(name='Top 5s', value=str(stat['placeB']))
                                 embed.add_field(name='Top 12s', value=str(stat['placeC']))
-                                break
+                                return embed
+                        return None
                     elif mode == 3:
                         embed.description = 'Squad Statistics'
                         for stat in js['stats']:
@@ -195,8 +206,8 @@ class PartyBus:
                                 embed.add_field(name='Kill Rate', value=str(round(stat['kills'] / stat['games'], 1)))
                                 embed.add_field(name='Top 3s', value=str(stat['placeB']))
                                 embed.add_field(name='Top 6s', value=str(stat['placeC']))
-                                break
-                    return embed
+                                return embed
+                        return None
 
     @staticmethod
     async def player_lpg(name):
