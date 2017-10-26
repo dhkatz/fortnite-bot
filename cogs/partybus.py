@@ -147,13 +147,16 @@ class PartyBus:
 
                     platform = js['stats'][0]['platform']
                     if platform == 'pc':
-                        embed.set_footer(text='PC', icon_url='https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Windows_logo_-_2012.svg/768px-Windows_logo_-_2012.svg.png')
+                        embed.set_footer(text='PC',
+                                         icon_url='https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Windows_logo_-_2012.svg/768px-Windows_logo_-_2012.svg.png')
                         embed.colour = 44527
                     elif platform == 'ps4':
-                        embed.set_footer(text='PS4', icon_url='https://psmedia.playstation.com/is/image/psmedia/404-three-column-playstationlogo-01-en-19feb15?$ThreeColFeature_Image$')
+                        embed.set_footer(text='PS4',
+                                         icon_url='https://psmedia.playstation.com/is/image/psmedia/404-three-column-playstationlogo-01-en-19feb15?$ThreeColFeature_Image$')
                         embed.colour = discord.Colour.dark_blue()
                     elif platform == 'xb1':
-                        embed.set_footer(text='XB1', icon_url='https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Xbox_one_logo.svg/2000px-Xbox_one_logo.svg.png')
+                        embed.set_footer(text='XB1',
+                                         icon_url='https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Xbox_one_logo.svg/2000px-Xbox_one_logo.svg.png')
                         embed.colour = 1080335
 
                     if mode == 1:
@@ -162,8 +165,10 @@ class PartyBus:
                             if stat['p'] == 2:
                                 embed.add_field(name='Total Games', value=str(stat['games']))
                                 embed.add_field(name='Wins', value=str(stat['placeA']))
-                                embed.add_field(name='Win Rate', value=str(round(stat['placeA'] / stat['games'] * 100, 2)) + '%')
-                                embed.add_field(name='KD Ratio', value=str(round(stat['kills'] / (stat['games'] - stat['placeA']), 1)))
+                                embed.add_field(name='Win Rate',
+                                                value=str(round(stat['placeA'] / stat['games'] * 100, 2)) + '%')
+                                embed.add_field(name='KD Ratio',
+                                                value=str(round(stat['kills'] / (stat['games'] - stat['placeA']), 1)))
                                 embed.add_field(name='Top 10s', value=str(stat['placeB']))
                                 embed.add_field(name='Top 25s', value=str(stat['placeC']))
                                 break
@@ -173,7 +178,8 @@ class PartyBus:
                             if stat['p'] == 10:
                                 embed.add_field(name='Total Games', value=str(stat['games']))
                                 embed.add_field(name='Wins', value=str(stat['placeA']))
-                                embed.add_field(name='Win Rate', value=str(round(stat['placeA'] / stat['games'] * 100, 2)) + '%')
+                                embed.add_field(name='Win Rate',
+                                                value=str(round(stat['placeA'] / stat['games'] * 100, 2)) + '%')
                                 embed.add_field(name='Kill Rate', value=str(round(stat['kills'] / stat['games'], 1)))
                                 embed.add_field(name='Top 5s', value=str(stat['placeB']))
                                 embed.add_field(name='Top 12s', value=str(stat['placeC']))
@@ -184,7 +190,8 @@ class PartyBus:
                             if stat['p'] == 9:
                                 embed.add_field(name='Total Games', value=str(stat['games']))
                                 embed.add_field(name='Wins', value=str(stat['placeA']))
-                                embed.add_field(name='Win Rate', value=str(round(stat['placeA'] / stat['games'] * 100, 2)) + '%')
+                                embed.add_field(name='Win Rate',
+                                                value=str(round(stat['placeA'] / stat['games'] * 100, 2)) + '%')
                                 embed.add_field(name='Kill Rate', value=str(round(stat['kills'] / stat['games'], 1)))
                                 embed.add_field(name='Top 3s', value=str(stat['placeB']))
                                 embed.add_field(name='Top 6s', value=str(stat['placeC']))
