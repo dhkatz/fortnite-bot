@@ -2,6 +2,7 @@ import aiohttp
 import discord
 from discord.ext import commands
 from peewee import *
+from datetime import datetime
 
 from bot import fortnite_db
 
@@ -58,7 +59,10 @@ class PartyBus:
 
         if len(player) > 0:
             embed = await self.player_lpg(player)
-            await ctx.send(embed=embed)
+            if embed is not None:
+                await ctx.send(embed=embed)
+            else:
+                await self.bot.embed_notify(ctx, 1, 'Error', 'No game data found!')
 
     @commands.command()
     async def ign(self, ctx, epic_id: str = ''):
@@ -134,10 +138,7 @@ class PartyBus:
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as r:
-                if r.status == 200:
-                    return True
-                else:
-                    return False
+                return r.status == 200
 
     @staticmethod
     async def player_stats(name, mode):
@@ -217,8 +218,30 @@ class PartyBus:
             async with session.get(url) as r:
                 if r.status == 200:
                     js = await r.json()
+                    game = js[0]
 
                     embed = discord.Embed()
+                    embed.colour = discord.Colour.green() if game['placeA'] > 0 else discord.Colour.dark_red()
+                    embed.title = 'Game Played ' + datetime.fromtimestamp(game['modified']).strftime('%Y-%m-%d') + ' (UTC)'
+                    embed.description = 'Duration: ' + str(game['minutes']) + ' Min.'
+                    embed.add_field(name='Mode',
+                                    value='Solo' if game['p'] == 2 else 'Duo' if game['p'] == 10 else 'Squad')
+                    embed.add_field(name='Result', value='Victory' if game['placeA'] > 0 else 'Lost')
+                    embed.add_field(name='Kills', value=game['kills'])
+
+                    platform = game['platform']
+                    if platform == 'pc':
+                        embed.set_footer(text='PC',
+                                         icon_url='https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Windows_logo_-_2012.svg/768px-Windows_logo_-_2012.svg.png')
+                    elif platform == 'ps4':
+                        embed.set_footer(text='PS4',
+                                         icon_url='https://psmedia.playstation.com/is/image/psmedia/404-three-column-playstationlogo-01-en-19feb15?$ThreeColFeature_Image$')
+                    elif platform == 'xb1':
+                        embed.set_footer(text='XB1',
+                                         icon_url='https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Xbox_one_logo.svg/2000px-Xbox_one_logo.svg.png')
+
+                    return embed
+                return None
 
 
 class BaseModel(Model):
@@ -227,7 +250,7 @@ class BaseModel(Model):
 
 
 class Player(BaseModel):
-    partybus_id = CharField(unique=True, default='')
+    partybus_id = CharField(default='')  # This should be unique, but no way to authenticate users
     discord_id = CharField(unique=True)
     blacklist = BooleanField(default=False)
 

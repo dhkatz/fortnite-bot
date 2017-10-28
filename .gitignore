@@ -57,3 +57,4 @@ fabric.properties
 .idea/modules.xml
 .idea/vcs.xml
 __pycache__/
+config/config.py

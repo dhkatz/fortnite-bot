@@ -1,2 +1,5 @@
+memory_profiler
+psutil
 discord.py
+praw
 peewee

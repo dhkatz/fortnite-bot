@@ -4,11 +4,13 @@ import asyncio
 import logging
 import sys
 import traceback
+import time
 from logging.handlers import RotatingFileHandler
 
 import discord
 from discord.ext import commands
 from peewee import SqliteDatabase
+from collections import Counter
 
 import config.config as config
 
@@ -19,6 +21,9 @@ class Bot(commands.Bot):
     def __init__(self, *args, **kwargs):
         self.logger = set_logger()
         self.db = fortnite_db
+        self.version = config.__version__
+        self.counter = Counter()
+        self.uptime = time.time()
         self.prefix = '.'
         super().__init__(*args, command_prefix=self.prefix, **kwargs)
 
@@ -41,7 +46,7 @@ def init(bot_class=Bot):
 
     @bot.event
     async def on_ready():
-        bot.logger.info(f'Logged in as {bot.user.name} ({bot.user.id}')
+        bot.logger.info(f'Logged into Discord as {bot.user.name} ({bot.user.id})')
         for cog in config.__cogs__:
             try:
                 bot.load_extension(cog)
@@ -62,11 +67,15 @@ def init(bot_class=Bot):
             await bot.embed_notify(ctx, 1, 'Command Cooldown', f'You\'re on cooldown! Try again in {str(error)[34:]}.')
         elif isinstance(error, commands.CheckFailure):
             await bot.embed_notify(ctx, 1, 'Command Error', 'You do not have permission to use this command!')
+        elif isinstance(error, commands.CommandNotFound):
+            command = str(error).split('\"')[1]
+            bot.logger.error(f'User tried to use command ({command}) that does not exist!')
         else:
             raise error
 
     @bot.event
     async def on_command(ctx):
+        bot.counter[ctx.command.name] += 1
         if isinstance(ctx.channel, discord.abc.PrivateChannel):
             destination = 'Private Message'
         else:
@@ -75,6 +84,8 @@ def init(bot_class=Bot):
 
     @bot.event
     async def on_message(message: discord.Message):
+        if message.author.bot:
+            return
         await bot.process_commands(message)
 
     return bot
