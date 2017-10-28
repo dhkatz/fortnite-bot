@@ -66,7 +66,7 @@ class PartyBus:
 
     @commands.command()
     async def ign(self, ctx, epic_id: str = ''):
-        """Tag your Paragon IGN to your Discord account. Surround names with spaces in quotes. Empty to see current."""
+        """Tag your Fortnite IGN to your Discord account. Surround names with spaces in quotes. Empty to see current."""
         embed = discord.Embed()
         if len(epic_id) > 0:
             player_id = await self.player_interface(ctx, epic_id)

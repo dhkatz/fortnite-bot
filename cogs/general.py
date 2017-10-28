@@ -29,6 +29,7 @@ class General:
 
     @commands.command()
     async def support(self, ctx):
+        """Do you need support from Epic Games?"""
         await self.bot.embed_notify(ctx, 2, 'Support', 'Our tech support page can be found at http://epic.gm/fnhelp'
                                                        '\nPlease see if any of the issues listed on the page apply to'
                                                        ' you, if not, use the Contact Us button on the right.')
