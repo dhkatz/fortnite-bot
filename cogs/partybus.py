@@ -55,6 +55,7 @@ class PartyBus:
 
     @commands.command()
     async def lpg(self, ctx, name: str = ''):
+        """Stats for most recently played game."""
         player = await self.player_interface(ctx, name)
 
         if len(player) > 0:
