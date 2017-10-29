@@ -1,5 +1,6 @@
 # BOT COG CONFIGURATION
-__version__ = '1.2.6a'
+__version__ = '1.2.6b'
+__token__ = 'YOUR TOKEN'
 
 __cogs__ = [
     'cogs.general',

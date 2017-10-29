@@ -109,7 +109,7 @@ def set_logger():
 
 
 def main(fortnite_bot: Bot):
-    yield from fortnite_bot.login('MzcyOTU3NTQ4NDUxNzI1MzIy.DNLvTg.5Rm11ctRS35M7_NM8ryxzN8uxuw')
+    yield from fortnite_bot.login(config.__token__)
     yield from fortnite_bot.connect()
 
 
