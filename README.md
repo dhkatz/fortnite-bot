@@ -39,3 +39,43 @@ Please see the requirements.txt for more of the packages required.
 
 * Python 3.6+
 * discord.py[voice] 1.0.0a0+ (Rewrite)
+
+Autorestarting on Linux
+-----------------------
+
+This guide assumes that your Linux distribution uses systemd (Example: Ubuntu 15.04 or newer). I am also assuming you have cloned the bot into /home/username/fortnite-bot (where username is some username you chose for the bot account).
+
+Run this command in terminal:
+`sudo nano /etc/systemd/system/fortnite.service`
+
+Next, paste the following script, replace, `username` with your linux account name and `usergroup` with your user’s group (usually the same as the username, but you can check with `groups username` in the terminal.)
+
+```bash
+[Unit]
+Description=fortnite-bot
+After=multi-user.target
+[Service]
+WorkingDirectory=/home/username/fortnite-bot
+User=username
+Group=usergroup
+ExecStart=/usr/bin/python /home/username/fortnite-bot/bot.py
+Type=idle
+Restart=always
+RestartSec=15
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Save with CTRL+O.
+
+You can now start the bot using
+`sudo systemctl start fortnite.service`
+
+If you want the bot to start automatically on boot, you can do `sudo systemctl enable fortnite.service`
+
+If you need to view the bot’s log, you can do `sudo journalctl -u fortnite.service`
+
+Other available commands:
+`sudo systemctl stop fortnite.service`
+`sudo systemctl restart fortnite.service`
