@@ -25,7 +25,7 @@ class Bot(commands.Bot):
         self.counter = Counter()
         self.uptime = time.time()
         self.prefix = '.'
-        super().__init__(*args, command_prefix=self.prefix, **kwargs)
+        super().__init__(*args, command_prefix=commands.when_mentioned_or(self.prefix), **kwargs)
 
     @staticmethod
     async def embed_notify(ctx: commands.Context, error: int, title: str, message: str, raw: bool = False):
