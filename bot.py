@@ -101,7 +101,7 @@ def set_logger():
     ch.setLevel(logging.INFO)
     logger.addHandler(ch)
 
-    fh = RotatingFileHandler(filename='discordbot.log', maxBytes=1024 * 5, backupCount=2, encoding='utf-8', mode='w')
+    fh = RotatingFileHandler(filename='data/discordbot.log', maxBytes=1024 * 5, backupCount=2, encoding='utf-8', mode='w')
     fh.setFormatter(log_format)
     logger.addHandler(fh)
 
