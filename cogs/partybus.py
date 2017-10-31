@@ -16,7 +16,7 @@ class PartyBus:
 
     def init(self):
         if 'player' not in self.bot.db.get_tables():
-            self.bot.logger.info('Created Player table in database.')
+            self.bot.logger.info('[PartyBus] Created Player table in database.')
             Player.create_table()
 
     @commands.command()

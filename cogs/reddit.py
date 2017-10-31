@@ -14,7 +14,7 @@ class Reddit:
                                     password=login['password'])
         self.subreddit = {'fortnite': self.instance.subreddit('fortnite'),
                           'fortnitebr': self.instance.subreddit('fortnitebr')}
-        self.bot.logger.info(f'Logged into Reddit as {self.instance.user.me()}')
+        self.bot.logger.info(f'[Reddit] Logged into Reddit as {self.instance.user.me()}')
         self.icon_url = 'http://i.imgur.com/sdO8tAw.png'
 
     @commands.group()

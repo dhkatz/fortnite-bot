@@ -11,6 +11,8 @@ import discord
 from discord.ext import commands
 from peewee import SqliteDatabase
 from collections import Counter
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from pytz import timezone
 
 import config.config as config
 
@@ -22,6 +24,7 @@ class Bot(commands.Bot):
         self.logger = set_logger()
         self.db = fortnite_db
         self.version = config.__version__
+        self.scheduler = AsyncIOScheduler(timezone=timezone('US/Pacific'))
         self.counter = Counter()
         self.uptime = time.time()
         self.prefix = '.'
@@ -46,12 +49,12 @@ def init(bot_class=Bot):
 
     @bot.event
     async def on_ready():
-        bot.logger.info(f'Logged into Discord as {bot.user.name} ({bot.user.id})')
+        bot.logger.info(f'[Core] Logged into Discord as {bot.user.name} ({bot.user.id})')
         for cog in config.__cogs__:
             try:
                 bot.load_extension(cog)
             except Exception as cog_error:
-                bot.logger.error(f'Unable to load cog {cog}')
+                bot.logger.error(f'[Core] Unable to load cog {cog}')
                 bot.logger.error(cog_error)
         await bot.change_presence(game=discord.Game(name='Fortnite (Say ' + bot.prefix + 'help)'))
 
@@ -69,7 +72,7 @@ def init(bot_class=Bot):
             await bot.embed_notify(ctx, 1, 'Command Error', 'You do not have permission to use this command!')
         elif isinstance(error, commands.CommandNotFound):
             command = str(error).split('\"')[1]
-            bot.logger.error(f'User tried to use command ({command}) that does not exist!')
+            bot.logger.error(f'[Core] User tried to use command ({command}) that does not exist!')
         else:
             raise error
 
@@ -80,7 +83,7 @@ def init(bot_class=Bot):
             destination = 'Private Message'
         else:
             destination = f'#{ctx.channel.name} ({ctx.guild.name})'
-        bot.logger.info(f'{ctx.author.name} in {destination}: {ctx.message.content}')
+        bot.logger.info(f'[Core] {ctx.author.name} in {destination}: {ctx.message.content}')
 
     @bot.event
     async def on_message(message: discord.Message):
@@ -101,7 +104,8 @@ def set_logger():
     ch.setLevel(logging.INFO)
     logger.addHandler(ch)
 
-    fh = RotatingFileHandler(filename='data/discordbot.log', maxBytes=1024 * 5, backupCount=2, encoding='utf-8', mode='w')
+    fh = RotatingFileHandler(filename='data/discordbot.log', maxBytes=1024 * 5, backupCount=2, encoding='utf-8',
+                             mode='w')
     fh.setFormatter(log_format)
     logger.addHandler(fh)
 
@@ -122,7 +126,7 @@ if __name__ == '__main__':
     except discord.LoginFailure:
         bot.logger.error(traceback.format_exc())
     except Exception as e:
-        bot.logger.exception('Fatal exception, attempting graceful logout.', exc_info=e)
+        bot.logger.exception('[Core] Fatal exception, attempting graceful logout.', exc_info=e)
         loop.run_until_complete(bot.logout())
     finally:
         loop.close()
