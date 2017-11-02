@@ -1,12 +1,14 @@
 # BOT COG CONFIGURATION
-__version__ = '1.3.6a'
+__version__ = '2.0.1a'
 __token__ = 'YOUR TOKEN'
 __dbl__ = {'token': 'DISCORDBOTS.ORG TOKEN',
            'id': 'DISCORDBOTS.ORG ID'
-}
+           }
 
 __cogs__ = [
-    'cogs.general',
+    'util.database',  # DO NOT DISABLE
+    'cogs.settings',  # DO NOT DISABLE
+    'cogs.general',  # DO NOT DISABLE
     'cogs.partybus',
     'cogs.reddit',
     'cogs.discordbots'

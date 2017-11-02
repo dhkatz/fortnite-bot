@@ -1,8 +1,12 @@
-import discord
 import platform
 import time
-from memory_profiler import memory_usage
+
+import discord
 from discord.ext import commands
+from memory_profiler import memory_usage
+
+from util import checks
+from util import context
 
 
 class General:
@@ -12,6 +16,7 @@ class General:
         self.bot = bot
 
     @commands.command()
+    @checks.cog_enabled()
     async def bug(self, ctx):
         """Where to report a bug found in Fortnite."""
         embed = discord.Embed()
@@ -111,6 +116,14 @@ class General:
                         value='{} {} {}'.format(platform.system(), platform.release(), platform.version()),
                         inline=False)
         await ctx.send(embed=embed)
+
+    @commands.command()
+    async def prefix(self, ctx: context.Context):
+        """Get the command prefix of this server."""
+        guild_prefix = ctx.db.get_setting(ctx.guild.id, 'prefix')
+        print(f'Guild Prefix: {guild_prefix}')
+        await self.bot.embed_notify(ctx, 2, 'Guild Prefix', f'The prefix of this server is "{guild_prefix}".'
+                                                            f'\nRemember you can also @ me to use commands!')
 
 
 def setup(bot):

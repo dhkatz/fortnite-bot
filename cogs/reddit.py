@@ -1,6 +1,12 @@
-import praw, prawcore, discord, time
-from config.config import __reddit__ as login
+import time
+
+import discord
+import praw
+import prawcore
 from discord.ext import commands
+
+from config.config import __reddit__ as login
+from util import checks
 from util.paginator import EmbedPages
 
 
@@ -18,12 +24,14 @@ class Reddit:
         self.icon_url = 'http://i.imgur.com/sdO8tAw.png'
 
     @commands.group()
+    @checks.cog_enabled()
     async def reddit(self, ctx):
         """Reddit commands. See 'help reddit'."""
         pass
 
     @reddit.command(name='sticky')
     @commands.cooldown(1, 15, commands.BucketType.user)
+    @checks.cog_enabled()
     async def reddit_stickied(self, ctx, subreddit: str = 'fortnite'):
         """Get the stickied posts from /r/Fortnite or /r/FortniteBR"""
         subreddit = 'fortnitebr' if 'fortnitebr' in subreddit else 'fortnite'  # Normalize name
@@ -43,6 +51,7 @@ class Reddit:
 
     @reddit.command(name='official')
     @commands.cooldown(1, 15, commands.BucketType.user)
+    @checks.cog_enabled()
     async def reddit_official(self, ctx):
         """Get official posts from Epic Games currently on the front page."""
         embeds = []

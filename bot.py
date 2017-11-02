@@ -3,20 +3,31 @@
 import asyncio
 import logging
 import sys
-import traceback
 import time
+import traceback
+from collections import Counter
 from logging.handlers import RotatingFileHandler
 
 import discord
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from discord.ext import commands
 from peewee import SqliteDatabase
-from collections import Counter
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from pytz import timezone
 
-import config.config as config
+from config import config
+from util import context
 
 fortnite_db = SqliteDatabase('data/fortnite.db')
+
+
+async def get_prefix(client, message):
+    prefixes = [client.prefix]
+    if isinstance(message.channel, discord.abc.PrivateChannel):
+        return commands.when_mentioned_or(*prefixes)(bot, message)
+    db = client.get_cog('Database')
+    guild_prefix = db.get_setting(message.guild.id, 'prefix')
+    prefixes = [guild_prefix]
+    return commands.when_mentioned_or(*prefixes)(bot, message)
 
 
 class Bot(commands.Bot):
@@ -28,7 +39,7 @@ class Bot(commands.Bot):
         self.counter = Counter()
         self.uptime = time.time()
         self.prefix = '.'
-        super().__init__(*args, command_prefix=commands.when_mentioned_or(self.prefix), **kwargs)
+        super().__init__(*args, command_prefix=get_prefix, **kwargs)
 
     @staticmethod
     async def embed_notify(ctx: commands.Context, error: int, title: str, message: str, raw: bool = False):
@@ -69,7 +80,10 @@ def init(bot_class=Bot):
         elif isinstance(error, commands.CommandOnCooldown):
             await bot.embed_notify(ctx, 1, 'Command Cooldown', f'You\'re on cooldown! Try again in {str(error)[34:]}.')
         elif isinstance(error, commands.CheckFailure):
-            await bot.embed_notify(ctx, 1, 'Command Error', 'You do not have permission to use this command!')
+            await bot.embed_notify(ctx, 1, 'Command Error',
+                                   'You do not have permission to use this command or it has been disabled!')
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await bot.embed_notify(ctx, 1, 'Command Error', str(error))
         elif isinstance(error, commands.CommandNotFound):
             command = str(error).split('\"')[1]
             bot.logger.error(f'[Core] User tried to use command ({command}) that does not exist!')
@@ -90,6 +104,14 @@ def init(bot_class=Bot):
         if message.author.bot:
             return
         await bot.process_commands(message)
+
+    @bot.event
+    async def process_commands(message: discord.Message):
+        ctx = await bot.get_context(message, cls=context.Context)
+        if not ctx.valid:
+            return
+
+        await bot.invoke(ctx)
 
     return bot
 

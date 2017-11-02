@@ -1,10 +1,12 @@
+from datetime import datetime
+
 import aiohttp
 import discord
 from discord.ext import commands
 from peewee import *
-from datetime import datetime
 
 from bot import fortnite_db
+from util import checks
 
 
 class PartyBus:
@@ -20,6 +22,7 @@ class PartyBus:
             Player.create_table()
 
     @commands.command()
+    @checks.cog_enabled()
     async def solo(self, ctx, name: str = ''):
         """Return solo stats for a player or yourself using Partybus.gg"""
         player = await self.player_interface(ctx, name)
@@ -32,6 +35,7 @@ class PartyBus:
                 await self.bot.embed_notify(ctx, 2, 'Notice', 'No solo statistics found!')
 
     @commands.command()
+    @checks.cog_enabled()
     async def duo(self, ctx, name: str = ''):
         """Return duo stats for a player or yourself using Partybus.gg"""
         player = await self.player_interface(ctx, name)
@@ -43,6 +47,7 @@ class PartyBus:
                 await self.bot.embed_notify(ctx, 2, 'Notice', 'No duo statistics found!')
 
     @commands.command()
+    @checks.cog_enabled()
     async def squad(self, ctx, name: str = ''):
         """Return squad stats for a player or yourself using Partybus.gg"""
         player = await self.player_interface(ctx, name)
@@ -54,6 +59,7 @@ class PartyBus:
                 await self.bot.embed_notify(ctx, 2, 'Notice', 'No squad statistics found!')
 
     @commands.command()
+    @checks.cog_enabled()
     async def lpg(self, ctx, name: str = ''):
         """Stats for most recently played game."""
         player = await self.player_interface(ctx, name)
@@ -66,6 +72,7 @@ class PartyBus:
                 await self.bot.embed_notify(ctx, 1, 'Error', 'No game data found!')
 
     @commands.command()
+    @checks.cog_enabled()
     async def ign(self, ctx, epic_id: str = ''):
         """Tag your Fortnite IGN to your Discord account. Surround names with spaces in quotes. Empty to see current."""
         embed = discord.Embed()
@@ -223,7 +230,8 @@ class PartyBus:
 
                     embed = discord.Embed()
                     embed.colour = discord.Colour.green() if game['placeA'] > 0 else discord.Colour.dark_red()
-                    embed.title = 'Game Played ' + datetime.fromtimestamp(game['modified']).strftime('%Y-%m-%d') + ' (UTC)'
+                    embed.title = 'Game Played ' + datetime.fromtimestamp(game['modified']).strftime(
+                        '%Y-%m-%d') + ' (UTC)'
                     embed.description = 'Duration: ' + str(game['minutes']) + ' Min.'
                     embed.add_field(name='Mode',
                                     value='Solo' if game['p'] == 2 else 'Duo' if game['p'] == 10 else 'Squad')
