@@ -51,6 +51,9 @@ fabric.properties
 # Discord Bot Files
 *.log
 *.log.*
+*.db
+
+# PyCharm Stuff
 .idea/Fortnite_Bot.iml
 .idea/inspectionProfiles/
 .idea/misc.xml
