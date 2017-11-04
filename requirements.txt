@@ -1,3 +1,4 @@
+aiohttp
 memory_profiler
 psutil
 discord.py==1.0.0a0

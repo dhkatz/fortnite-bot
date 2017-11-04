@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import aiohttp
 import discord
@@ -20,6 +20,19 @@ class PartyBus:
         if 'player' not in self.bot.db.get_tables():
             self.bot.logger.info('[PartyBus] Created Player table in database.')
             Player.create_table()
+
+    @commands.command()
+    @checks.cog_enabled()
+    async def stats(self, ctx, name: str = ''):
+        """Return general stats for a player or yourself using Partybus.gg"""
+        player = await self.player_interface(ctx, name)
+
+        if len(player) > 0:
+            embed = await self.player_stats(player, 4)
+            if embed is not None:
+                await ctx.send(embed=embed)
+            else:
+                await self.bot.embed_notify(ctx, 2, 'No statistics found!')
 
     @commands.command()
     @checks.cog_enabled()
@@ -137,12 +150,22 @@ class PartyBus:
                                             + 'ign <PlayerName>!')
             return ''
         else:
+            await self.player_update(name)  # Update the player's data before returning
             return name
 
     @staticmethod
     async def player_exists(name: str):
         """Check if a player account exists."""
         url = 'https://api.partybus.gg/v1/players/' + name
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as r:
+                return r.status == 200
+
+    @staticmethod
+    async def player_update(name: str):
+        """Update a player's data through API call."""
+        url = f'https://api.partybus.gg/v1/players/{name}/update'
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as r:
@@ -181,6 +204,10 @@ class PartyBus:
                         embed.description = 'Solo Statistics'
                         for stat in js['stats']:
                             if stat['p'] == 2:
+                                minutes = timedelta(minutes=int(stat['minutes']))
+                                time = datetime(1, 1, 1) + minutes
+                                time = '{}D {}H {}M'.format(time.day - 1, time.hour, time.minute)
+                                embed.description += f' ({time})'
                                 embed.add_field(name='Total Games', value=str(stat['games']))
                                 embed.add_field(name='Wins', value=str(stat['placeA']))
                                 embed.add_field(name='Win Rate',
@@ -195,6 +222,10 @@ class PartyBus:
                         embed.description = 'Duo Statistics'
                         for stat in js['stats']:
                             if stat['p'] == 10:
+                                minutes = timedelta(minutes=int(stat['minutes']))
+                                time = datetime(1, 1, 1) + minutes
+                                time = '{}D {}H {}M'.format(time.day - 1, time.hour, time.minute)
+                                embed.description += f' ({time})'
                                 embed.add_field(name='Total Games', value=str(stat['games']))
                                 embed.add_field(name='Wins', value=str(stat['placeA']))
                                 embed.add_field(name='Win Rate',
@@ -208,6 +239,10 @@ class PartyBus:
                         embed.description = 'Squad Statistics'
                         for stat in js['stats']:
                             if stat['p'] == 9:
+                                minutes = timedelta(minutes=int(stat['minutes']))
+                                time = datetime(1, 1, 1) + minutes
+                                time = '{}D {}H {}M'.format(time.day - 1, time.hour, time.minute)
+                                embed.description += f' ({time})'
                                 embed.add_field(name='Total Games', value=str(stat['games']))
                                 embed.add_field(name='Wins', value=str(stat['placeA']))
                                 embed.add_field(name='Win Rate',
@@ -217,6 +252,28 @@ class PartyBus:
                                 embed.add_field(name='Top 6s', value=str(stat['placeC']))
                                 return embed
                         return None
+                    elif mode == 4:
+                        embed.description = 'Overall Statistics'
+                        kills = time = wins = top25 = top10 = games = 0
+                        for stat in js['stats']:
+                            games += stat['games']
+                            kills += stat['kills']
+                            time += stat['minutes']
+                            wins += stat['placeA']
+                            top10 += stat['placeB']
+                            top25 += stat['placeC']
+                        minutes = timedelta(minutes=int(time))
+                        time = datetime(1, 1, 1) + minutes
+                        time = '{}D {}H {}M'.format(time.day - 1, time.hour, time.minute)
+                        embed.description += f' ({time})'
+                        embed.add_field(name='Total Games', value=str(games))
+                        embed.add_field(name='Wins', value=str(wins))
+                        embed.add_field(name='Win Rate',
+                                        value=str(round(wins / games * 100, 2)) + '%')
+                        embed.add_field(name='Kill Rate', value=str(round(kills / games, 1)))
+                        embed.add_field(name='Top 25%', value=str(round(top25 / games * 100, 2)) + '%')
+                        embed.add_field(name='Top 10%', value=str(round(top10 / games * 100, 2)) + '%')
+                        return embed
 
     @staticmethod
     async def player_lpg(name):

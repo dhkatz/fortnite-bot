@@ -44,18 +44,105 @@ class Settings:
     async def prefix_get(self, ctx: context.Context):
         """Get the prefix for this server."""
         guild_prefix = ctx.db.get_setting(ctx.guild.id, 'prefix')
-        print(f'Guild Prefix: {guild_prefix}')
-        await self.bot.embed_notify(ctx, 2, 'Guild Prefix', f'The prefix of this server is "{guild_prefix}".'
-                                                            f'\nRemember you can also @ me to use commands!')
+        if guild_prefix.count('|'):
+            prefixes = guild_prefix.split('|')
+            guild_prefix = ''
+            for prefix in prefixes:
+                if len(prefix):
+                    guild_prefix += f'\"{prefix}\" '
+            await self.bot.embed_notify(ctx, 2, 'Guild Prefix', f'The prefixes of this server are {guild_prefix}.'
+                                                                f'\nRemember you can also @ me to use commands!')
+        else:
+            await self.bot.embed_notify(ctx, 2, 'Guild Prefix', f'The prefix of this server is "{guild_prefix}".'
+                                                                f'\nRemember you can also @ me to use commands!')
 
     @prefix.command(name='set')
     @commands.guild_only()
     @checks.is_admin()
     async def prefix_set(self, ctx: context.Context, new_prefix: str):
-        """Set the prefix for this server. BE CAREFUL! Remember you can @ the bot if you mess up."""
+        """Set the ONE prefix for this server. Use add to add more. Remember you can @ the bot if you mess up."""
+        if '|' in new_prefix:
+            await self.bot.embed_notify(ctx, 1, 'Guild Prefix Error', 'Your prefix cannot contain the character \'|\'')
+            return
+        elif new_prefix.startswith(('@', '#')):
+            await self.bot.embed_notify(ctx, 1, 'Guild Prefix Error',
+                                        f'Your prefix cannot start with the character {new_prefix[0]}')
+            return
         changed = ctx.db.set_setting(ctx.guild.id, 'prefix', new_prefix)
         if changed:
             await self.bot.embed_notify(ctx, 2, 'Guild Prefix', f'The prefix of this server is now "{new_prefix}".'
+                                                                f'\nRemember you can also @ me to use commands!')
+        else:
+            await self.bot.embed_notify(ctx, 1, 'Guild Prefix', 'Error changing the server prefix!')
+
+    @prefix.command(name='add')
+    @commands.guild_only()
+    @checks.is_admin()
+    async def prefix_add(self, ctx: context.Context, new_prefix: str):
+        """Add another prefix for this server. BE CAREFUL! Remember you can @ the bot if you mess up."""
+        if '|' in new_prefix:
+            await self.bot.embed_notify(ctx, 1, 'Guild Prefix Error', 'Your prefix cannot contain the character \'|\'')
+            return
+        elif new_prefix.startswith(('@', '#')):
+            await self.bot.embed_notify(ctx, 1, 'Guild Prefix Error',
+                                        f'Your prefix cannot start with the character {new_prefix[0]}')
+            return
+        current = ctx.db.get_setting(ctx.guild.id, 'prefix')
+        if '|' in current:  # Multiple prefixes
+            if new_prefix in current.split('|'):
+                await self.bot.embed_notify(ctx, 1, 'Guild Prefix Error', 'This prefix already exists!')
+                return
+            else:  # Add the prefix to the existing list
+                current += new_prefix + '|'
+        else:
+            if new_prefix in current:
+                await self.bot.embed_notify(ctx, 1, 'Guild Prefix Error', 'This prefix already exists!')
+                return
+            else:
+                current += '|' + new_prefix + '|'
+        changed = ctx.db.set_setting(ctx.guild.id, 'prefix', current)
+        if changed:
+            await self.bot.embed_notify(ctx, 2, 'Guild Prefix', f'The prefix "{new_prefix}" has been added.'
+                                                                f'\nRemember you can also @ me to use commands!')
+        else:
+            await self.bot.embed_notify(ctx, 1, 'Guild Prefix', 'Error changing the server prefix!')
+
+    @prefix.command(name='remove')
+    @commands.guild_only()
+    @checks.is_admin()
+    async def prefix_remove(self, ctx: context.Context, prefix: str):
+        """Remove a prefix for this server. You must always have at least one."""
+        if '|' in prefix:
+            await self.bot.embed_notify(ctx, 1, 'Guild Prefix Error', 'Prefixes cannot contain the character \'|\'')
+            return
+        current = ctx.db.get_setting(ctx.guild.id, 'prefix')
+        if '|' in current:
+            if prefix not in current:
+                await self.bot.embed_notify(ctx, 1, 'Guild Prefix Error', 'This prefix does not exist!')
+                return
+            if current.count('|') == 2:
+                current = current.replace('|' + prefix + '|', '')
+            else:
+                current = current.replace(prefix + '|', '')
+        else:  # We only have one prefix
+            await self.bot.embed_notify(ctx, 1, 'Guild Prefix Error', 'You must have at least one prefix! '
+                                                                      'Please use prefix reset to set default.')
+            return
+        changed = ctx.db.set_setting(ctx.guild.id, 'prefix', current)
+        if changed:
+            await self.bot.embed_notify(ctx, 2, 'Guild Prefix', f'The prefix "{prefix}" has been removed.'
+                                                                f'\nRemember you can also @ me to use commands!')
+        else:
+            await self.bot.embed_notify(ctx, 1, 'Guild Prefix', 'Error changing the server prefix!')
+
+    @prefix.command(name='reset')
+    @commands.guild_only()
+    @checks.is_admin()
+    async def prefix_reset(self, ctx: context.Context):
+        """Reset the server prefix to the default"""
+        changed = ctx.db.set_setting(ctx.guild.id, 'prefix', self.bot.prefix)
+        if changed:
+            await self.bot.embed_notify(ctx, 2, 'Guild Prefix', f'The prefix has been reset to "{self.bot.prefix}".'
                                                                 f'\nRemember you can also @ me to use commands!')
         else:
             await self.bot.embed_notify(ctx, 1, 'Guild Prefix', 'Error changing the server prefix!')

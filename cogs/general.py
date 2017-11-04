@@ -23,7 +23,8 @@ class General:
         embed.title = 'Epic Games Support'
         embed.colour = discord.Colour.blue()
         embed.description = 'How do I submit a bug report for Fortnite?'
-        embed.url = 'http://fortnitehelp.epicgames.com/customer/en/portal/articles/2841545-how-do-i-submit-a-bug-report-for-fortnite-'
+        embed.url = 'http://fortnitehelp.epicgames.com/customer/en/portal/articles/2841545-how-do-i-submit-a-bug' \
+                    '-report-for-fortnite- '
         embed.add_field(name='Report the Bug In-game',
                         value='• Open the game menu\n\n• Select *Feedback*\n\n• Select *Bug*\n\n'
                               '• Fill in the *Subject* and *Body* fields with your feedback\n\n• Select *Send*',
@@ -42,14 +43,16 @@ class General:
     @commands.command()
     async def lfg(self, ctx):
         """Are you looking for a game?"""
-        br_channels, stw_channels = set(), set()
-        br_list = stw_list = ''
+        br_channels, stw_channels, lfg_channels = set(), set(), set()
+        br_list = stw_list = lfg_list = ''
         for channel in ctx.guild.channels:
             if isinstance(channel, discord.TextChannel) and 'lfg' in channel.name:
                 if 'br' in channel.name:
                     br_channels.add(channel)
                 elif 'stw' in channel.name:
                     stw_channels.add(channel)
+                else:
+                    lfg_channels.add(channel)
 
         if len(br_channels) > 0:
             br_list = '**Battle Royale:** '
@@ -69,13 +72,26 @@ class General:
                     if len(stw_channels) > 0:
                         stw_list += ' | '
             stw_list += '\n\n'
+        if len(lfg_channels) > 0:
+            lfg_list = '**LFG Channels:** '
+            while len(lfg_channels) > 0:
+                channel = lfg_channels.pop()
+                if 'lfg' in channel.name:
+                    lfg_list += channel.mention
+                    if len(lfg_channels) > 0:
+                        lfg_list += ' | '
+            lfg_list += '\n\n'
         if len(br_list) or len(stw_list):
             await ctx.send('Please use any of the #lfg channels if you\'re looking for people to play with:\n\n' +
                            br_list + stw_list)
+        elif len(lfg_list):
+            await ctx.send('Please use any of the #lfg channels if you\'re looking for people to play with:\n\n' +
+                           lfg_list)
         else:
             await self.bot.embed_notify(ctx, 1, 'Error', 'This server does not have any LFG channels setup!\n\n'
-                                                         'Please add channels containing *lfg* and either'
-                                                         ' *br* or *stw*.\n\nExample: **lfg_br** or **lfg_stw_pc**.')
+                                                         'Please add channels containing *lfg* and optionally either'
+                                                         ' *br* or *stw*.\n\n'
+                                                         'Example: **lfg_channel**, **lfg_br**, or **lfg_stw_pc**.')
 
     @commands.command(name='info', aliases=['uptime', 'up'])
     async def _status(self, ctx: commands.Context):
@@ -121,9 +137,17 @@ class General:
     async def prefix(self, ctx: context.Context):
         """Get the command prefix of this server."""
         guild_prefix = ctx.db.get_setting(ctx.guild.id, 'prefix')
-        print(f'Guild Prefix: {guild_prefix}')
-        await self.bot.embed_notify(ctx, 2, 'Guild Prefix', f'The prefix of this server is "{guild_prefix}".'
-                                                            f'\nRemember you can also @ me to use commands!')
+        if guild_prefix.count('|'):
+            prefixes = guild_prefix.split('|')
+            guild_prefix = ''
+            for prefix in prefixes:
+                if len(prefix):
+                    guild_prefix += f'\"{prefix}\" '
+            await self.bot.embed_notify(ctx, 2, 'Guild Prefix', f'The prefixes of this server are {guild_prefix}.'
+                                                                f'\nRemember you can also @ me to use commands!')
+        else:
+            await self.bot.embed_notify(ctx, 2, 'Guild Prefix', f'The prefix of this server is "{guild_prefix}".'
+                                                                f'\nRemember you can also @ me to use commands!')
 
 
 def setup(bot):

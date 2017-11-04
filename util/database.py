@@ -12,13 +12,31 @@ class Database:
 
     def init(self):
         if 'guild' not in self.bot.db.get_tables():
-            self.bot.logger.info('[Database] Created Player table in database.')
+            self.bot.logger.info('[Database] Created Guild table in database.')
             Guild.create_table()
+
+    async def on_guild_join(self, guild):
+        self.insert(guild.id)
+
+    async def on_guild_remove(self, guild):
+        self.delete(guild.id)
 
     def insert(self, guild_id: int):
         """Insert a new Guild into the database."""
         guild = self.bot.get_guild(guild_id)
+        self.bot.logger.info('[Database] New Guild added to the database.')
         return Guild.create(id=guild.id, name=guild.name)
+
+    def delete(self, guild_id: int):
+        """Remove a Guild from the database."""
+        try:
+            guild = Guild.get(Guild.id == guild_id)
+        except DoesNotExist:
+            guild = None
+
+        if guild is not None:
+            guild.delete()
+            self.bot.logger.info('[Database] Guild was delete from the database.')
 
     def get(self, guild_id: int):
         """Get a Guild database object,"""

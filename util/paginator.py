@@ -1,4 +1,5 @@
 import asyncio
+
 import discord
 from discord.embeds import _EmptyEmbed
 
@@ -242,7 +243,7 @@ class Pages:
 
 
 class EmbedPages:
-    """ Build paged embeds for Paragon content. (Cards, Gems, Decks, etc.) """
+    """ Build paged embeds for a list of similar items. (Cards, Gems, Decks, etc.) """
 
     def __init__(self, ctx, *, entries, icon_url=None, show_entry_count=True):
         self.bot = ctx.bot
@@ -515,7 +516,7 @@ import re
 # ?help command
 #   -> could be a subcommand
 
-_mention = re.compile(r'<@\!?([0-9]{1,19})>')
+_mention = re.compile(r'<@!?([0-9]{1,19})>')
 
 
 def cleanup_prefix(bot, prefix):

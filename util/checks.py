@@ -20,7 +20,7 @@ def has_permissions(*, check=all, **perms):
     return commands.check(predicate)
 
 
-def check_guild_permissions(ctx: commands.Context, perms, *, check=all):
+def check_guild_permissions(ctx, perms, *, check=all):
     owner = ctx.author.id == config.__owner__
     if owner:
         return True

@@ -39,6 +39,13 @@ class DiscordBots:
     async def updatecount(self, ctx):
         await self.send()
 
+    @commands.command(name='discordbots')
+    async def discord_bots(self, ctx):
+        embed = await self.bot.embed_notify(ctx, 2, 'Discord Bots Information',
+                                            'Please vote for this bot on DiscordBots.org', True)
+        embed.url = 'https://discordbots.org/bot/372957548451725322'
+        await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(DiscordBots(bot))

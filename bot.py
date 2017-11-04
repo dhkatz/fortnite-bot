@@ -26,7 +26,10 @@ async def get_prefix(client, message):
         return commands.when_mentioned_or(*prefixes)(bot, message)
     db = client.get_cog('Database')
     guild_prefix = db.get_setting(message.guild.id, 'prefix')
-    prefixes = [guild_prefix]
+    if guild_prefix.count('|'):
+        prefixes = guild_prefix.split('|')
+    else:
+        prefixes = [guild_prefix]
     return commands.when_mentioned_or(*prefixes)(bot, message)
 
 
@@ -38,7 +41,7 @@ class Bot(commands.Bot):
         self.scheduler = AsyncIOScheduler(timezone=timezone('US/Pacific'))
         self.counter = Counter()
         self.uptime = time.time()
-        self.prefix = '.'
+        self.prefix = '.'  # Fallback prefix for DMs and default
         super().__init__(*args, command_prefix=get_prefix, **kwargs)
 
     @staticmethod
@@ -46,7 +49,13 @@ class Bot(commands.Bot):
         """Create and reply Discord embeds in one line."""
         embed = discord.Embed()
         embed.title = title
-        embed.colour = discord.Colour.dark_red() if error == 1 else discord.Colour.green() if error == 0 else discord.Colour.blue()
+        if error == 1:
+            embed.colour = discord.Colour.dark_red()
+        else:
+            if error == 0:
+                embed.colour = discord.Colour.green()
+            else:
+                embed.colour = discord.Colour.blue()
         embed.description = message
         # embed.set_footer(text='Fortnite', icon_url='https://i.imgur.com/HZWHuVg.png')
         if raw:
@@ -56,64 +65,65 @@ class Bot(commands.Bot):
 
 
 def init(bot_class=Bot):
-    bot = bot_class(description='Fortnite: Battle Royale stats bot.')
+    client = bot_class(description='Fortnite: Battle Royale stats bot.')
 
-    @bot.event
+    @client.event
     async def on_ready():
-        bot.logger.info(f'[Core] Logged into Discord as {bot.user.name} ({bot.user.id})')
+        client.logger.info(f'[Core] Logged into Discord as {client.user.name} ({client.user.id})')
         for cog in config.__cogs__:
             try:
-                bot.load_extension(cog)
+                client.load_extension(cog)
             except Exception as cog_error:
-                bot.logger.error(f'[Core] Unable to load cog {cog}')
-                bot.logger.error(cog_error)
-        await bot.change_presence(game=discord.Game(name='Fortnite (Say ' + bot.prefix + 'help)'))
+                client.logger.error(f'[Core] Unable to load cog {cog}')
+                client.logger.error(cog_error)
+        await client.change_presence(game=discord.Game(name='Fortnite (Say ' + client.prefix + 'help)'))
 
-    @bot.event
+    @client.event
     async def on_command_error(ctx, error):
         if isinstance(error, commands.NoPrivateMessage):
-            await bot.embed_notify(ctx, 1, 'Error', 'This command cannot be used in private messages!')
+            await client.embed_notify(ctx, 1, 'Error', 'This command cannot be used in private messages!')
         elif isinstance(error, commands.DisabledCommand):
             await ctx.send(':x: This command has been disabled.')
         elif isinstance(error, commands.CommandInvokeError):
             raise error
         elif isinstance(error, commands.CommandOnCooldown):
-            await bot.embed_notify(ctx, 1, 'Command Cooldown', f'You\'re on cooldown! Try again in {str(error)[34:]}.')
+            await client.embed_notify(ctx, 1, 'Command Cooldown',
+                                      f'You\'re on cooldown! Try again in {str(error)[34:]}.')
         elif isinstance(error, commands.CheckFailure):
-            await bot.embed_notify(ctx, 1, 'Command Error',
-                                   'You do not have permission to use this command or it has been disabled!')
+            await client.embed_notify(ctx, 1, 'Command Error',
+                                      'You do not have permission to use this command or it has been disabled!')
         elif isinstance(error, commands.MissingRequiredArgument):
-            await bot.embed_notify(ctx, 1, 'Command Error', str(error))
+            await client.embed_notify(ctx, 1, 'Command Error', str(error))
         elif isinstance(error, commands.CommandNotFound):
             command = str(error).split('\"')[1]
-            bot.logger.error(f'[Core] User tried to use command ({command}) that does not exist!')
+            client.logger.error(f'[Core] User tried to use command ({command}) that does not exist!')
         else:
             raise error
 
-    @bot.event
+    @client.event
     async def on_command(ctx):
-        bot.counter[ctx.command.name] += 1
+        client.counter[ctx.command.name] += 1
         if isinstance(ctx.channel, discord.abc.PrivateChannel):
             destination = 'Private Message'
         else:
             destination = f'#{ctx.channel.name} ({ctx.guild.name})'
-        bot.logger.info(f'[Core] {ctx.author.name} in {destination}: {ctx.message.content}')
+        client.logger.info(f'[Core] {ctx.author.name} in {destination}: {ctx.message.content}')
 
-    @bot.event
+    @client.event
     async def on_message(message: discord.Message):
         if message.author.bot:
             return
-        await bot.process_commands(message)
+        await client.process_commands(message)
 
-    @bot.event
+    @client.event
     async def process_commands(message: discord.Message):
-        ctx = await bot.get_context(message, cls=context.Context)
+        ctx = await client.get_context(message, cls=context.Context)
         if not ctx.valid:
             return
 
-        await bot.invoke(ctx)
+        await client.invoke(ctx)
 
-    return bot
+    return client
 
 
 def set_logger():

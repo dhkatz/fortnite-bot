@@ -1,5 +1,5 @@
 # BOT COG CONFIGURATION
-__version__ = '2.0.1a'
+__version__ = '2.1.1a'
 __token__ = 'YOUR TOKEN'
 __dbl__ = {'token': 'DISCORDBOTS.ORG TOKEN',
            'id': 'DISCORDBOTS.ORG ID'
