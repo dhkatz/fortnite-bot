@@ -60,7 +60,7 @@ This guide assumes that your Linux distribution uses systemd (Example: Ubuntu 15
 Run this command in terminal:
 `sudo nano /etc/systemd/system/fortnite.service`
 
-Next, paste the following script, replace, `username` with your linux account name and `usergroup` with your user’s group (usually the same as the username, but you can check with `groups username` in the terminal.)
+Next, paste the following script, replace, `username` with your linux account name and `usergroup` with your user's group (usually the same as the username, but you can check with `groups username` in the terminal.)
 
 ```bash
 [Unit]
@@ -86,7 +86,7 @@ You can now start the bot using
 
 If you want the bot to start automatically on boot, you can do `sudo systemctl enable fortnite.service`
 
-If you need to view the bot’s log, you can do `sudo journalctl -u fortnite.service`
+If you need to view the bot's log, you can do `sudo journalctl -u fortnite.service`
 
 Other available commands:
 `sudo systemctl stop fortnite.service`
