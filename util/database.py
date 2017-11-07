@@ -24,7 +24,7 @@ class Database:
     def insert(self, guild_id: int):
         """Insert a new Guild into the database."""
         guild = self.bot.get_guild(guild_id)
-        self.bot.logger.info('[Database] New Guild added to the database.')
+        self.bot.logger.info(f'[Database] New Guild ({guild.name}) added to the database.')
         return Guild.create(id=guild.id, name=guild.name)
 
     def delete(self, guild_id: int):
@@ -35,8 +35,8 @@ class Database:
             guild = None
 
         if guild is not None:
-            guild.delete()
-            self.bot.logger.info('[Database] Guild was delete from the database.')
+            self.bot.logger.info(f'[Database] Guild ({guild.name}) was deleted from the database.')
+            guild.delete_instance()
 
     def get(self, guild_id: int):
         """Get a Guild database object,"""

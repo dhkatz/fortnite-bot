@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import asyncio
+import aiohttp
 import logging
 import sys
 import time

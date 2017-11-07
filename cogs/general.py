@@ -1,5 +1,8 @@
 import platform
 import time
+import aiohttp
+import asyncio
+import pycountry
 
 import discord
 from discord.ext import commands
@@ -7,6 +10,7 @@ from memory_profiler import memory_usage
 
 from util import checks
 from util import context
+from util import paginator
 
 
 class General:
@@ -39,6 +43,25 @@ class General:
         await self.bot.embed_notify(ctx, 2, 'Support', 'Our tech support page can be found at http://epic.gm/fnhelp'
                                                        '\nPlease see if any of the issues listed on the page apply to'
                                                        ' you, if not, use the Contact Us button on the right.')
+
+    @commands.command()
+    async def twitch(self, ctx):
+        """Get the top Fortnite Twitch streamers."""
+        url = 'https://api.partybus.gg/v1/streams'
+        streamers = []
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as r:
+                if r.status == 200:
+                    json = await r.json()
+                    for i in range(0, 10):
+                        streamers.append(json[i])
+
+        embeds = []
+        for streamer in streamers:
+            if isinstance(streamer, dict):
+                embeds.append(await self.build_stream_embed(streamer))
+        p = paginator.EmbedPages(ctx, icon_url='https://i.imgur.com/dXyljNT.png', entries=embeds)
+        await p.paginate()
 
     @commands.command()
     async def lfg(self, ctx):
@@ -148,6 +171,17 @@ class General:
         else:
             await self.bot.embed_notify(ctx, 2, 'Guild Prefix', f'The prefix of this server is "{guild_prefix}".'
                                                                 f'\nRemember you can also @ me to use commands!')
+
+    @staticmethod
+    async def build_stream_embed(streamer):
+        embed = discord.Embed(color=6570404)
+        embed.title = streamer['displayName']
+        embed.description = streamer['status']
+        embed.url = f'https://twitch.tv/{streamer["name"]}'
+        embed.add_field(name='Viewers', value=str(streamer['viewers']))
+        language = pycountry.languages.lookup(streamer['language'][:2])
+        embed.add_field(name='Language', value=language.name)
+        return embed
 
 
 def setup(bot):
