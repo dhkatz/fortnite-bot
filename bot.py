@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import asyncio
-import aiohttp
+import configparser
 import logging
 import sys
 import time
@@ -15,7 +15,6 @@ from discord.ext import commands
 from peewee import SqliteDatabase
 from pytz import timezone
 
-from config import config
 from util import context
 
 fortnite_db = SqliteDatabase('data/fortnite.db')
@@ -37,8 +36,10 @@ async def get_prefix(client, message):
 class Bot(commands.Bot):
     def __init__(self, *args, **kwargs):
         self.logger = set_logger()
+        self.config = configparser.ConfigParser()
+        self.config.read('config/config.ini')
         self.db = fortnite_db
-        self.version = config.__version__
+        self.version = self.config['core']['version']
         self.scheduler = AsyncIOScheduler(timezone=timezone('US/Pacific'))
         self.counter = Counter()
         self.uptime = time.time()
@@ -71,7 +72,7 @@ def init(bot_class=Bot):
     @client.event
     async def on_ready():
         client.logger.info(f'[Core] Logged into Discord as {client.user.name} ({client.user.id})')
-        for cog in config.__cogs__:
+        for _, cog in client.config.items('cogs'):
             try:
                 client.load_extension(cog)
             except Exception as cog_error:
@@ -146,7 +147,7 @@ def set_logger():
 
 
 def main(fortnite_bot: Bot):
-    yield from fortnite_bot.login(config.__token__)
+    yield from fortnite_bot.login(fortnite_bot.config['core']['token'])
     yield from fortnite_bot.connect()
 
 

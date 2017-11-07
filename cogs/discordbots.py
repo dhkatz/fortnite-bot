@@ -3,8 +3,6 @@ import json
 import aiohttp
 from discord.ext import commands
 
-import config.config as config
-
 
 class DiscordBots:
     def __init__(self, bot):
@@ -16,11 +14,11 @@ class DiscordBots:
             'server_count': len(self.bot.guilds)
         })
         head = {
-            'authorization': config.__dbl__['token'],
+            'authorization': self.bot.config['discordbots']['token'],
             'content-type': 'application/json'
         }
 
-        url = 'https://discordbots.org/api/bots/{0}/stats'.format(config.__dbl__['id'])
+        url = 'https://discordbots.org/api/bots/{0}/stats'.format(self.bot.config['discordbots']['token'])
         async with aiohttp.ClientSession() as session:
             async with session.post(url, data=dump, headers=head) as resp:
                 self.bot.logger.info('[DiscordBots] Returned {0.status} for {1}'.format(resp, dump))

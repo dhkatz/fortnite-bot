@@ -7,7 +7,6 @@ from discord.ext import commands
 from peewee import *
 
 from bot import fortnite_db
-from config.config import __reddit__ as login
 from util import checks
 from util.paginator import EmbedPages
 
@@ -17,9 +16,10 @@ class Reddit:
 
     def __init__(self, bot):
         self.bot = bot
-        self.instance = praw.Reddit(user_agent='Fortnite Discord Bot', client_id=login['client_id'],
-                                    client_secret=login['client_secret'], username=login['username'],
-                                    password=login['password'])
+        self.instance = praw.Reddit(user_agent='Fortnite Discord Bot', client_id=self.bot.config['reddit']['client_id'],
+                                    client_secret=self.bot.config['reddit']['client_secret'],
+                                    username=self.bot.config['reddit']['username'],
+                                    password=self.bot.config['reddit']['password'])
         self.subreddit = {'fortnite': self.instance.subreddit('fortnite'),
                           'fortnitebr': self.instance.subreddit('fortnitebr')}
         self.bot.logger.info(f'[Reddit] Logged into Reddit as {self.instance.user.me()}')

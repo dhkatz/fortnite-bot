@@ -1,11 +1,10 @@
 from discord.ext import commands
 
-from config import config
 from util import context
 
 
 def check_permissions(ctx, perms, *, check=all):
-    owner = ctx.author.id == config.__owner__
+    owner = ctx.author.id == ctx.cfg['core']['owner']
     if owner:
         return True
 
@@ -21,7 +20,7 @@ def has_permissions(*, check=all, **perms):
 
 
 def check_guild_permissions(ctx, perms, *, check=all):
-    owner = ctx.author.id == config.__owner__
+    owner = ctx.author.id == ctx.cfg['core']['owner']
     if owner:
         return True
 

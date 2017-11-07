@@ -2,9 +2,7 @@
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff:
-.idea/**/workspace.xml
 .idea/**/tasks.xml
-.idea/dictionaries
 
 # Sensitive or high-churn files:
 .idea/**/dataSources/
@@ -54,10 +52,7 @@ fabric.properties
 *.db
 
 # PyCharm Stuff
+.idea/
 .idea/Fortnite_Bot.iml
-.idea/inspectionProfiles/
-.idea/misc.xml
-.idea/modules.xml
-.idea/vcs.xml
 __pycache__/
-config/config.py
+config/config.ini

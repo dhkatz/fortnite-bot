@@ -1,10 +1,9 @@
 import platform
 import time
-import aiohttp
-import asyncio
-import pycountry
 
+import aiohttp
 import discord
+import pycountry
 from discord.ext import commands
 from memory_profiler import memory_usage
 

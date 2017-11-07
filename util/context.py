@@ -7,5 +7,9 @@ class Context(commands.Context):
         super().__init__(**kwargs)
 
     @property
+    def cfg(self):
+        return self.bot.config
+
+    @property
     def db(self):
         return self.bot.get_cog('Database')
