@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from urllib.parse import quote
 
 import aiohttp
 import discord
@@ -156,7 +157,8 @@ class PartyBus:
     @staticmethod
     async def player_exists(name: str):
         """Check if a player account exists."""
-        url = 'https://api.partybus.gg/v1/players/' + name
+
+        url = 'https://api.partybus.gg/v1/players/' + quote(name)
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as r:
@@ -165,7 +167,7 @@ class PartyBus:
     @staticmethod
     async def player_update(name: str):
         """Update a player's data through API call."""
-        url = f'https://api.partybus.gg/v1/players/{name}/update'
+        url = f'https://api.partybus.gg/v1/players/{quote(name)}/update'
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as r:
@@ -174,7 +176,7 @@ class PartyBus:
     @staticmethod
     async def player_stats(name, mode):
         """Get the general stats for a Fortnite player."""
-        url = 'https://api.partybus.gg/v1/players/' + name
+        url = 'https://api.partybus.gg/v1/players/' + quote(name)
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as r:
@@ -184,7 +186,7 @@ class PartyBus:
                     embed = discord.Embed()
 
                     embed.title = js['details']['displayName']
-                    embed.url = 'https://partybus.gg/player/' + js['details']['displayName']
+                    embed.url = 'https://partybus.gg/player/' + quote(js['details']['displayName'])
 
                     platform = js['stats'][0]['platform']
                     if platform == 'pc':
@@ -277,7 +279,7 @@ class PartyBus:
 
     @staticmethod
     async def player_lpg(name):
-        url = 'https://api.partybus.gg/v1/players/' + name + '/history?p='
+        url = 'https://api.partybus.gg/v1/players/' + quote(name) + '/history?p='
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as r:
