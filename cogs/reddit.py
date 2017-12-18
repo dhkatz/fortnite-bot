@@ -130,7 +130,7 @@ class Reddit:
         embeds = []
         for _, subreddit in self.subreddit.items():
             for submission in subreddit.hot():
-                if str(submission.link_flair_text).upper() in ['OFFICIAL', 'EPIC RESPONSE']:
+                if str(submission.link_flair_text).upper() in ['OFFICIAL', 'EPIC RESPONSE', 'EPIC', 'EPIC COMMENT']:
                     embeds.append(await self.build_submission_embed(submission))
 
         if len(embeds) == 0:
