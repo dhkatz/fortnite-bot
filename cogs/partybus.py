@@ -75,7 +75,7 @@ class PartyBus:
     @commands.command()
     @checks.cog_enabled()
     async def lpg(self, ctx, name: str = ''):
-        """Stats for most recently played game."""
+        """Stats for most recently played mode. Only accurate to last MODE, NOT game."""
         player = await self.player_interface(ctx, name)
 
         if len(player) > 0:

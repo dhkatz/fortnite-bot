@@ -1,5 +1,3 @@
-import json
-
 import aiohttp
 from discord.ext import commands
 
@@ -8,20 +6,15 @@ class DiscordBots:
     def __init__(self, bot):
         self.bot = bot
         self.bot.scheduler.add_job(self.send, 'interval', hours=1)
+        self.dbltoken = self.bot.config['discordbots']['token']
+        self.url = "https://discordbots.org/api/bots/" + self.bot.user.id + "/stats"
+        self.headers = {"Authorization": self.dbltoken}
 
     async def send(self):
-        dump = json.dumps({
-            'server_count': len(self.bot.guilds)
-        })
-        head = {
-            'authorization': self.bot.config['discordbots']['token'],
-            'content-type': 'application/json'
-        }
-
-        url = 'https://discordbots.org/api/bots/{0}/stats'.format(self.bot.config['discordbots']['token'])
-        async with aiohttp.ClientSession() as session:
-            async with session.post(url, data=dump, headers=head) as resp:
-                self.bot.logger.info('[DiscordBots] Returned {0.status} for {1}'.format(resp, dump))
+        payload = {"server_count": len(self.bot.guilds)}
+        async with aiohttp.ClientSession() as aioclient:
+            async with aioclient.post(self.url, data=payload, headers=self.headers) as resp:
+                self.bot.logger.info('[DiscordBots] Returned {0.status} for {1}'.format(resp, payload))
 
     async def on_ready(self):
         await self.send()
