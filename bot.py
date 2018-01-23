@@ -78,7 +78,7 @@ def init(bot_class=Bot):
             except Exception as cog_error:
                 client.logger.error(f'[Core] Unable to load cog {cog}')
                 client.logger.error(cog_error)
-        await client.change_presence(game=discord.Game(name='Fortnite (Say ' + client.prefix + 'help)'))
+        await client.change_presence(game=discord.Game(name=f'Fortnite (Say {client.prefix}help)'))
 
     @client.event
     async def on_command_error(ctx, error):
@@ -113,17 +113,14 @@ def init(bot_class=Bot):
 
     @client.event
     async def on_message(message: discord.Message):
-        if message.author.bot:
-            return
-        await client.process_commands(message)
+        if not message.author.bot:
+            await client.process_commands(message)
 
     @client.event
     async def process_commands(message: discord.Message):
         ctx = await client.get_context(message, cls=context.Context)
-        if not ctx.valid:
-            return
-
-        await client.invoke(ctx)
+        if ctx.valid:
+            await client.invoke(ctx)
 
     return client
 
