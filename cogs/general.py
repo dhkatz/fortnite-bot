@@ -6,6 +6,7 @@ import discord
 import pycountry
 from discord.ext import commands
 from memory_profiler import memory_usage
+from bs4 import BeautifulSoup
 
 from util import checks
 from util import context
@@ -170,6 +171,27 @@ class General:
         else:
             await self.bot.embed_notify(ctx, 2, 'Guild Prefix', f'The prefix of this server is "{guild_prefix}".'
                                                                 f'\nRemember you can also @ me to use commands!')
+
+    @commands.command(hidden=True)
+    async def daily(self, ctx: context.Context):
+        """Get daily sale items."""
+        url = f'https://stormshield.one/pvp/sales'
+        html = None
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as r:
+                if r.status == 200:
+                    html = await r.text()
+
+        if html is None:
+            return None
+
+        soup = BeautifulSoup(html, 'html.parser')
+
+        items = soup.find_all(class_='sale__items')[1].find_all('strong')
+        title = [item.parent.text for item in items]
+        title = [item.replace('\n', ' ').strip() for item in title]
+        print(title)
+        await ctx.send(items)
 
     @staticmethod
     async def build_stream_embed(streamer):

@@ -33,7 +33,7 @@ async def get_prefix(client, message):
     return commands.when_mentioned_or(*prefixes)(bot, message)
 
 
-class Bot(commands.Bot):
+class Bot(commands.AutoShardedBot):
     def __init__(self, *args, **kwargs):
         self.logger = set_logger()
         self.config = configparser.ConfigParser()
