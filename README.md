@@ -4,6 +4,7 @@ Fortnite-Bot
 [![forthebadge](http://forthebadge.com/images/badges/made-with-python.svg)](http://forthebadge.com)
 [![forthebadge](http://forthebadge.com/images/badges/compatibility-club-penguin.svg)](http://forthebadge.com)
 
+[![Discord Bots](https://discordbots.org/api/widget/372957548451725322.svg)](https://discordbots.org/bot/372957548451725322)
 
 A Discord Bot built for use specifically in Fortnite related Discord servers. Made with hate and [discord.py](https://github.com/Rapptz/discord.py).
 This bot is not designed to be setup by anyone else, but it's design intention is easy to understand.
@@ -42,7 +43,15 @@ Command and Aliases | Description | Usage
 
 ### Settings ###
 
-WIP
+Command and Aliases | Description | Usage
+----------------|--------------|-------
+`.settings cog get` | Get the current status of a cog/extension/plugin. Use 'all' instead to get all cogs. | `.settings cog get all`, `.settings cog get reddit`
+`.settings cog set` | Set the status of a cog/extension/plugin. Value must be true/false. | `.settings cog set reddit false`
+`.settings prefix add` | Add another prefix for this server. BE CAREFUL! Remember you can @ the bot if you mess up. | `.settings prefix add $`
+`.settings prefix get` | Get the prefix for this server. | `.settings prefix get`
+`.settings prefix remove` | Remove a prefix for this server. You must always have at least one. | `.settings prefix remove $`
+`.settings prefix reset` | Reset the server prefix to the default. | `.settings prefix reset`
+`.settings prefix set` | Set the ONE prefix for this server. Use add to add more. Remember you can @ the bot if you mess up. | `.settings prefix set !`
 
 General Requirements
 ------------
