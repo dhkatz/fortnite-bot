@@ -47,7 +47,7 @@ class Bot(commands.Bot):
         super().__init__(*args, command_prefix=get_prefix, **kwargs)
 
     @staticmethod
-    async def embed_notify(ctx: commands.Context, error: int, title: str, message: str, raw: bool = False):
+    async def embed_notify(ctx: commands.Context, error: int, title: str, message: str = '', raw: bool = False):
         """Create and reply Discord embeds in one line."""
         embed = discord.Embed()
         embed.title = title

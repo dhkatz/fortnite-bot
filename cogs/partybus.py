@@ -28,7 +28,7 @@ class PartyBus:
         """Return general stats for a player or yourself using Partybus.gg"""
         player = await self.player_interface(ctx, name)
 
-        if len(player) > 0:
+        if len(player):
             embed = await self.player_stats(player, 4)
             if embed is not None:
                 await ctx.send(embed=embed)
@@ -124,9 +124,9 @@ class PartyBus:
                                             + '\n(See \'' + self.bot.prefix
                                             + 'help ign\' for more command information!)')
 
-    async def player_interface(self, ctx, name):
+    async def player_interface(self, ctx, name: str) -> str:
         # Command has NOT specified a username
-        if len(name) == 0:
+        if not len(name):
             try:
                 # Player is stored in DB
                 player = Player.get(Player.discord_id == ctx.author.id)
@@ -139,8 +139,8 @@ class PartyBus:
                     # Private channel. We have to pull by name or DB
                     name = ctx.author.name
 
-        if not await self.player_exists(name):
-            if len(name) > 0:
+        if not (await self.player_load(name) and await self.player_exists(name)):
+            if len(name):
                 await self.bot.embed_notify(ctx, 1, 'Error',
                                             'The user you entered does not seem to exist, please re-check the name!')
             else:
@@ -155,7 +155,17 @@ class PartyBus:
             return name
 
     @staticmethod
-    async def player_exists(name: str):
+    async def player_load(name: str) -> bool:
+        """Load a player for the first time. (Party Bus bug)"""
+
+        url = 'https://api.partybus.gg/v1/players/lookup/' + quote(name)
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as r:
+                return r.status == 200
+
+    @staticmethod
+    async def player_exists(name: str) -> bool:
         """Check if a player account exists."""
 
         url = 'https://api.partybus.gg/v1/players/' + quote(name)
@@ -165,7 +175,7 @@ class PartyBus:
                 return r.status == 200
 
     @staticmethod
-    async def player_update(name: str):
+    async def player_update(name: str) -> bool:
         """Update a player's data through API call."""
         url = f'https://api.partybus.gg/v1/players/{quote(name)}/update'
 
@@ -276,6 +286,7 @@ class PartyBus:
                         embed.add_field(name='Top 25%', value=str(round(top25 / games * 100, 2)) + '%')
                         embed.add_field(name='Top 10%', value=str(round(top10 / games * 100, 2)) + '%')
                         return embed
+                print('WE ARE RETURNING FALSE')
 
     @staticmethod
     async def player_lpg(name):
