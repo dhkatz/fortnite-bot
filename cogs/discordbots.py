@@ -26,7 +26,7 @@ class DiscordBots:
         for guild in self.bot.guilds:
             shards[guild.shard_id] += 1
 
-        payload = {"shards": shards}
+        payload = {"server_count": shards}
         async with aiohttp.ClientSession() as session:
             async with session.post(self.url, data=payload, headers=self.headers) as response:
                 self.bot.logger.info(f'[DiscordBots] Returned {response.status} for {payload}')
