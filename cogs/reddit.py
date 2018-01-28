@@ -99,7 +99,6 @@ class Reddit:
         embed.add_field(name='Report Reason', value='This comment offended me.', inline=False)
         embed.add_field(name='Report Notes',
                         value='Possibly contains offensive content.', inline=False)
-        # embed.set_footer(icon_url=self.icon_url, text='Approved by MCiLuZiioNz')
         await ctx.send(embed=embed)
 
     @reddit.command(name='sticky')

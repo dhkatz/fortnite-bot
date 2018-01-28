@@ -5,6 +5,9 @@ import aiohttp
 import discord
 from discord.ext import commands
 from peewee import *
+from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
 
 from bot import fortnite_db
 from util import checks
@@ -16,11 +19,33 @@ class PartyBus:
     def __init__(self, bot):
         self.bot = bot
         self.init()
+        self.image_stats = {
+            'name': (427, 90),
+            'solo': {'ratio': (277, 323)},
+            'duo': {'ratio': (659, 323)},
+            'squad': {'ratio': (1042, 323)}
+        }
 
     def init(self):
         if 'player' not in self.bot.db.get_tables():
             self.bot.logger.info('[PartyBus] Created Player table in database.')
             Player.create_table()
+
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    @checks.cog_enabled()
+    async def image(self, ctx):
+        player = await self.player_interface(ctx, 'Doctor Jew')
+        embed = await self.player_stats(player, 4)
+        img = Image.open('Fortnite.png')
+        draw = ImageDraw.Draw(img)
+        font = ImageFont.truetype('burbank.ttf', 24)
+        text = '9.02'
+        offset = font.getoffset(text)[1]
+        w, h = draw.textsize(text, font=font)
+
+        draw.text(((self.image_stats['solo']['ratio'][0] - w) / 2, (self.image_stats['solo']['ratio'][1] - h - offset) / 2), text, font=font)
+        img.save('Fortnite-out.png')
 
     @commands.command()
     @checks.cog_enabled()
@@ -280,13 +305,11 @@ class PartyBus:
                         embed.description += f' ({time})'
                         embed.add_field(name='Total Games', value=str(games))
                         embed.add_field(name='Wins', value=str(wins))
-                        embed.add_field(name='Win Rate',
-                                        value=str(round(wins / games * 100, 2)) + '%')
+                        embed.add_field(name='Win Rate', value=str(round(wins / games * 100, 2)) + '%')
                         embed.add_field(name='Kill Rate', value=str(round(kills / games, 1)))
                         embed.add_field(name='Top 25%', value=str(round(top25 / games * 100, 2)) + '%')
                         embed.add_field(name='Top 10%', value=str(round(top10 / games * 100, 2)) + '%')
                         return embed
-                print('WE ARE RETURNING FALSE')
 
     @staticmethod
     async def player_lpg(name):
