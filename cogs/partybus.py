@@ -3,11 +3,11 @@ from urllib.parse import quote
 
 import aiohttp
 import discord
-from discord.ext import commands
-from peewee import *
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
+from discord.ext import commands
+from peewee import *
 
 from bot import fortnite_db
 from util import checks
@@ -41,7 +41,7 @@ class PartyBus:
         draw = ImageDraw.Draw(img)
         font = ImageFont.truetype('burbank.ttf', 24)
         text = '9.02'
-        offset = font.getoffset(text)[1]
+        offset = font.getoffset(text)[1]  # Remove the Y padding
         w, h = draw.textsize(text, font=font)
 
         draw.text(((self.image_stats['solo']['ratio'][0] - w) / 2, (self.image_stats['solo']['ratio'][1] - h - offset) / 2), text, font=font)
@@ -49,7 +49,7 @@ class PartyBus:
 
     @commands.command()
     @checks.cog_enabled()
-    async def stats(self, ctx, name: str = ''):
+    async def stats(self, ctx, *, name: str = ''):
         """Return general stats for a player or yourself using Partybus.gg"""
         player = await self.player_interface(ctx, name)
 
@@ -62,7 +62,7 @@ class PartyBus:
 
     @commands.command()
     @checks.cog_enabled()
-    async def solo(self, ctx, name: str = ''):
+    async def solo(self, ctx, *, name: str = ''):
         """Return solo stats for a player or yourself using Partybus.gg"""
         player = await self.player_interface(ctx, name)
 
@@ -75,7 +75,7 @@ class PartyBus:
 
     @commands.command()
     @checks.cog_enabled()
-    async def duo(self, ctx, name: str = ''):
+    async def duo(self, ctx, *, name: str = ''):
         """Return duo stats for a player or yourself using Partybus.gg"""
         player = await self.player_interface(ctx, name)
         if len(player) > 0:
@@ -87,7 +87,7 @@ class PartyBus:
 
     @commands.command()
     @checks.cog_enabled()
-    async def squad(self, ctx, name: str = ''):
+    async def squad(self, ctx, *, name: str = ''):
         """Return squad stats for a player or yourself using Partybus.gg"""
         player = await self.player_interface(ctx, name)
         if len(player) > 0:
@@ -99,7 +99,7 @@ class PartyBus:
 
     @commands.command()
     @checks.cog_enabled()
-    async def lpg(self, ctx, name: str = ''):
+    async def lpg(self, ctx, *, name: str = ''):
         """Stats for most recently played mode. Only accurate to last MODE, NOT game."""
         player = await self.player_interface(ctx, name)
 
@@ -112,8 +112,8 @@ class PartyBus:
 
     @commands.command()
     @checks.cog_enabled()
-    async def ign(self, ctx, epic_id: str = ''):
-        """Tag your Fortnite IGN to your Discord account. Surround names with spaces in quotes. Empty to see current."""
+    async def ign(self, ctx, *, epic_id: str = ''):
+        """Tag your Fortnite IGN to your Discord account. Empty to see current."""
         embed = discord.Embed()
         if len(epic_id) > 0:
             player_id = await self.player_interface(ctx, epic_id)

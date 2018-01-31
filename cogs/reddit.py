@@ -31,6 +31,10 @@ class Reddit:
             self.bot.logger.info('[Reddit] Created Post table in database.')
             Post.create_table()
 
+    @commands.command()
+    async def rtest(self, ctx):
+        pass
+
     @commands.group()
     @checks.cog_enabled()
     async def reddit(self, ctx):
@@ -115,7 +119,7 @@ class Reddit:
                 continue
             else:
                 embeds.append(await self.build_submission_embed(sticky))
-        if len(embeds) == 0:
+        if not len(embeds):
             self.bot.embed_notify(ctx, 2, 'Notice', 'There are currently no announcements!')
             return
         p = EmbedPages(ctx, icon_url=self.icon_url, entries=embeds)
@@ -132,7 +136,7 @@ class Reddit:
                 if str(submission.link_flair_text).upper() in ['OFFICIAL', 'EPIC RESPONSE', 'EPIC', 'EPIC COMMENT']:
                     embeds.append(await self.build_submission_embed(submission))
 
-        if len(embeds) == 0:
+        if not len(embeds):
             self.bot.embed_notify(ctx, 2, 'Notice', 'There are currently no official posts!')
             return
 
@@ -158,12 +162,17 @@ class BaseModel(Model):
 
 class Post(BaseModel):
     id = IntegerField(primary_key=True, unique=True)
+    subreddit = CharField()
     title = CharField()
     url = CharField(null=True)  # Might be a text post
     author = CharField()
     log_id = IntegerField()  # Moderation log message ID
     approved = BooleanField(default=False)
     flair = CharField(null=True)  # Might not have a flair
+
+
+class Bug(BaseModel):
+    post = ForeignKeyField(Post, primary_key=True)
 
 
 def setup(bot):

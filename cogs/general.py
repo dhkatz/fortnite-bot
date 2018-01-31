@@ -48,16 +48,26 @@ class General:
 
         return player
 
+    @commands.command()
+    async def donate(self, ctx: context.Context):
+        """Can you donate to keep the bot alive?"""
+        embed = discord.Embed()
+        embed.title = 'Donations'
+        embed.colour = 0xefce47
+        embed.url = 'https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=ZCVUPVPYKUUBN'
+        embed.description = 'If you can, please donate to keep the bot alive.'
+        embed.add_field(name='Bitcoin', value='1B4NMnzEhQ55wF6X7vj6Utfh79fP15nkw')
+        embed.add_field(name='Ethereum', value='0x392b8411d4796c0af98a1E64d23882EC948F0198')
+        embed.add_field(name='Paypal', value='xiluziionz@gmail.com', inline=False)
+        await ctx.send(embed=embed)
+
     @commands.command(name='info', aliases=['uptime', 'up'])
     async def _status(self, ctx: context.Context):
         """Information about the bot's status."""
         uptime = time.time() - self.bot.uptime
-        hours = uptime / 3600
-        minutes = (uptime / 60) % 60
-        seconds = uptime % 60
+        hours, minutes, seconds = uptime / 3600, (uptime / 60) % 60, uptime % 60
 
-        users = 0
-        channel = 0
+        users, channel = 0, 0
         try:
             commands_chart = sorted(self.bot.counter.items(), key=lambda t: t[1], reverse=False)
             top_command = commands_chart.pop()
@@ -87,6 +97,19 @@ class General:
                         value='{} {} {}'.format(platform.system(), platform.release(), platform.version()),
                         inline=False)
         await ctx.send(embed=embed)
+
+    @commands.command()
+    async def ping(self, ctx: context.Context):
+        """Measure bot response time."""
+        ping = ctx.message
+        pong = await ctx.send(embed=discord.Embed(title='Measuring Latency...', color=discord.Colour.dark_red()))
+        delta = pong.created_at - ping.created_at
+        delta = int(delta.total_seconds() * 1000)
+        embed = discord.Embed(color=discord.Colour.green())
+        embed.title = 'Latency Results'
+        embed.add_field(name='Round Trip', value=f'{delta} ms')
+        embed.add_field(name='Web Socket Latency', value=f'{round(self.bot.latency, 5)} ms')
+        await pong.edit(embed=embed)
 
     @commands.command()
     async def prefix(self, ctx: context.Context):

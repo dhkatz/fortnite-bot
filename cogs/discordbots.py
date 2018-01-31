@@ -7,9 +7,9 @@ class DiscordBots:
     def __init__(self, bot):
         self.bot = bot
         self.bot.scheduler.add_job(self.full_send, 'interval', hours=1)
-        self.dbltoken = self.bot.config['discordbots']['token']
+        self.dbl_token = self.bot.config['discordbots']['token']
         self.url = "https://discordbots.org/api/bots/" + str(self.bot.user.id) + "/stats"
-        self.headers = {"Authorization": self.dbltoken}
+        self.headers = {"Authorization": self.dbl_token}
 
     async def send(self, guild: Guild):
         payload = {

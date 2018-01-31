@@ -5,4 +5,6 @@ psutil
 praw
 peewee
 apscheduler
+beautifulsoup4
 pycountry
+pillow
