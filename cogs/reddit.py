@@ -31,10 +31,6 @@ class Reddit:
             self.bot.logger.info('[Reddit] Created Post table in database.')
             Post.create_table()
 
-    @commands.command()
-    async def rtest(self, ctx):
-        pass
-
     @commands.group()
     @checks.cog_enabled()
     async def reddit(self, ctx):
