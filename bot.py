@@ -59,7 +59,6 @@ class Bot(commands.AutoShardedBot):
             else:
                 embed.colour = discord.Colour.blue()
         embed.description = message
-        # embed.set_footer(text='Fortnite', icon_url='https://i.imgur.com/HZWHuVg.png')
         if raw:
             return embed
         else:
