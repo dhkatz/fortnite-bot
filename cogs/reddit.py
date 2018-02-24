@@ -4,9 +4,7 @@ import discord
 import praw
 import prawcore
 from discord.ext import commands
-from peewee import *
 
-from bot import fortnite_db
 from util import checks
 from util.paginator import EmbedPages
 
@@ -24,12 +22,6 @@ class Reddit:
                           'fortnitebr': self.instance.subreddit('fortnitebr')}
         self.bot.logger.info(f'[Reddit] Logged into Reddit as {self.instance.user.me()}')
         self.icon_url = 'http://i.imgur.com/sdO8tAw.png'
-        # self.bot.scheduler.add_job()
-
-    def init(self):
-        if 'post' not in self.bot.db.get_tables():
-            self.bot.logger.info('[Reddit] Created Post table in database.')
-            Post.create_table()
 
     @commands.group()
     @checks.cog_enabled()
@@ -86,7 +78,8 @@ class Reddit:
         """Test post embed"""
         embed = discord.Embed()
         embed.colour = discord.Colour.dark_red()
-        embed.title = 'Pending Report'
+        embed.title = 'Resolved Report'
+        embed.colour = discord.Colour.green()
         embed.description = 'Please reapprove, remove, or ignore the report.'
         embed.url = 'https://www.google.com/'
         embed.add_field(name='Author', value='JShredz')
@@ -99,6 +92,30 @@ class Reddit:
         embed.add_field(name='Report Reason', value='This comment offended me.', inline=False)
         embed.add_field(name='Report Notes',
                         value='Possibly contains offensive content.', inline=False)
+        embed.set_footer(icon_url=self.icon_url, text='Removed by MCiLuZiioNz')
+        await ctx.send(embed=embed)
+
+    @commands.command(hidden=True)
+    @checks.cog_enabled()
+    @commands.is_owner()
+    async def test4(self, ctx):
+        """Test post embed"""
+        embed = discord.Embed()
+        embed.colour = discord.Colour.dark_red()
+        embed.title = 'Pending Report'
+        embed.description = 'Please approve, remove, or ignore the report.'
+        embed.url = 'https://www.google.com/'
+        embed.add_field(name='Author', value='JShredz')
+        embed.add_field(name='Post Type', value='Comment')
+        embed.add_field(name='Content', value='Some generic mean comment', inline=False)
+        embed.add_field(name='Score', value='-63')
+        embed.add_field(name='Reports', value='2')
+        embed.add_field(name='Approved', value='False')
+        embed.add_field(name='Time', value='Wed, 01 Nov 2017 20:21 GMT')
+        embed.add_field(name='Report Reason', value='This comment offended me.', inline=False)
+        embed.add_field(name='Report Notes',
+                        value='Possibly contains offensive content.', inline=False)
+        embed.set_footer(icon_url=self.icon_url, text='Removed by MCiLuZiioNz')
         await ctx.send(embed=embed)
 
     @reddit.command(name='sticky')
@@ -149,26 +166,6 @@ class Reddit:
         embed.add_field(name='Time', value=time.strftime("%a, %d %b %Y %H:%M GMT", time.gmtime(submission.created_utc)),
                         inline=False)
         return embed
-
-
-class BaseModel(Model):
-    class Meta:
-        database = fortnite_db
-
-
-class Post(BaseModel):
-    id = IntegerField(primary_key=True, unique=True)
-    subreddit = CharField()
-    title = CharField()
-    url = CharField(null=True)  # Might be a text post
-    author = CharField()
-    log_id = IntegerField()  # Moderation log message ID
-    approved = BooleanField(default=False)
-    flair = CharField(null=True)  # Might not have a flair
-
-
-class Bug(BaseModel):
-    post = ForeignKeyField(Post, primary_key=True)
 
 
 def setup(bot):

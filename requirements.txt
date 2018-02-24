@@ -8,3 +8,5 @@ apscheduler
 beautifulsoup4
 pycountry
 pillow
+pytz
+youtube_dl

@@ -42,14 +42,14 @@ def has_guild_permissions(*, check=all, **perms):
 
 def is_mod():
     def predicate(ctx):
-        return check_guild_permissions(ctx, {'manage_guild': True})
+        return (yield from ctx.bot.is_owner(ctx.author)) or check_guild_permissions(ctx, {'manage_guild': True})
 
     return commands.check(predicate)
 
 
 def is_admin():
     def predicate(ctx):
-        return check_guild_permissions(ctx, {'administrator': True})
+        return (yield from ctx.bot.is_owner(ctx.author)) or check_guild_permissions(ctx, {'administrator': True})
 
     return commands.check(predicate)
 

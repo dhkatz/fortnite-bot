@@ -79,6 +79,7 @@ def init(bot_class=Bot):
                 client.logger.error(f'[Core] Unable to load cog {cog}')
                 client.logger.error(cog_error)
         await client.change_presence(game=discord.Game(name=f'Fortnite (Say {client.prefix}help)'))
+        client.scheduler.start()
 
     @client.event
     async def on_command_error(ctx, error):
