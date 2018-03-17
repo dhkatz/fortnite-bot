@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Tuple
 from urllib.parse import quote
 
 import aiohttp
@@ -164,7 +165,7 @@ class PartyBus:
                     # Private channel. We have to pull by name or DB
                     name = ctx.author.name
 
-        if not (await self.player_load(name) and await self.player_exists(name)):
+        if not ((await self.player_load(name))[0]):
             if len(name):
                 await self.bot.embed_notify(ctx, 1, 'Error',
                                             'The user you entered does not seem to exist, please re-check the name!')
@@ -177,27 +178,21 @@ class PartyBus:
             return ''
         else:
             await self.player_update(name)  # Update the player's data before returning
-            return name
+            return (await self.player_load(name))[1]
 
     @staticmethod
-    async def player_load(name: str) -> bool:
+    async def player_load(name: str) -> Tuple[bool, str]:
         """Load a player for the first time. (Party Bus bug)"""
 
         url = 'https://api.partybus.gg/v1/players/lookup/' + quote(name)
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as r:
-                return r.status == 200
-
-    @staticmethod
-    async def player_exists(name: str) -> bool:
-        """Check if a player account exists."""
-
-        url = 'https://api.partybus.gg/v1/players/' + quote(name)
-
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as r:
-                return r.status == 200
+                if r.status == 200:
+                    json = await r.json()
+                    return True, json['displayName']
+                else:
+                    return False, ''
 
     @staticmethod
     async def player_update(name: str) -> bool:
