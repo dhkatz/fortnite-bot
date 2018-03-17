@@ -164,7 +164,7 @@ class PartyBus:
                     # Private channel. We have to pull by name or DB
                     name = ctx.author.name
 
-        if not ((await self.player_load(name))[0]):
+        if not (await self.player_load(name))[0]:
             if len(name):
                 await self.bot.embed_notify(ctx, 1, 'Error',
                                             'The user you entered does not seem to exist, please re-check the name!')
