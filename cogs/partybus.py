@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from typing import Tuple
 from urllib.parse import quote
 
 import aiohttp
@@ -181,7 +180,7 @@ class PartyBus:
             return (await self.player_load(name))[1]
 
     @staticmethod
-    async def player_load(name: str) -> Tuple[bool, str]:
+    async def player_load(name: str):
         """Load a player for the first time. (Party Bus bug)"""
 
         url = 'https://api.partybus.gg/v1/players/lookup/' + quote(name)
