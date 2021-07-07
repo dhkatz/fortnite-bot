@@ -2,9 +2,6 @@ Fortnite-Bot
 ===================
 
 [![forthebadge](http://forthebadge.com/images/badges/made-with-python.svg)](http://forthebadge.com)
-[![forthebadge](http://forthebadge.com/images/badges/compatibility-club-penguin.svg)](http://forthebadge.com)
-
-[![Discord Bots](https://discordbots.org/api/widget/372957548451725322.svg)](https://discordbots.org/bot/372957548451725322)
 
 A Discord Bot built for use specifically in Fortnite related Discord servers. Made with hate and [discord.py](https://github.com/Rapptz/discord.py).
 This bot is not designed to be setup by anyone else, but it's design intention is easy to understand.
